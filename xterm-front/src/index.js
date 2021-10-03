@@ -13,9 +13,9 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-var term = new Terminal();
-term.open(document.getElementById('root'));
-term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ');
+var term = new Terminal({cursorBlink: true});
+term.open(document.getElementById("root"));
+term.write(" $ ");
 
 const serverAddress = "http://localhost:8080";
 const socket = io(serverAddress);
@@ -32,21 +32,22 @@ term.prompt();
 
 // // Receive data from socket
 socket.on("input-response", function(data) {
-  const output = `${data}\n`
-  term.write(output)
+  term.write(data)
+  curr_line = ""
+  term.write("\r\n $ ")
 })
 
 term.onKey(function(key, ev) {
-  console.log("on key", key, ev)
-  //Enter
-  if (key.domEvent.keyCode === 13) {
+  //console.log(key, ev);
+  if (key.domEvent.key === "Enter") {
+    console.log("Got Enter");
     if (curr_line) {
       entries.push(curr_line);
       term.write("\r\n");
       term.prompt();
     }
-  } else if (key.domEvent.keyCode === 8) {
-    // Backspace
+  } else if (key.domEvent.key === "Backspace") {
+    console.log("Got Backspace");
     if (curr_line) {
       curr_line = curr_line.slice(0, curr_line.length - 1);
       term.write("\b \b");
